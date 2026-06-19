@@ -502,9 +502,9 @@ async function submitForm(){
   };
 
   try{
-    var r=await fetch('https://formspree.io/f/xqeorpzj',{
+    var r=await fetch('https://hook.eu1.make.com/bg524qii9s34i6sbdtpb5iqmn16rky5x',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify(data)
     });
     if(!r.ok) throw new Error();
