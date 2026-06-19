@@ -431,15 +431,46 @@ async function submitForm(){
   };
 
   try{
+    // 1) Formspree - e-mail notifikace
     var r=await fetch('https://formspree.io/f/xqeorpzj',{
       method:'POST',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(data)
     });
-    if(r.ok){
-      document.querySelector('.main form').style.display='none';
-      document.getElementById('vf-ok').style.display='block';
-    } else { throw new Error(); }
+    if(!r.ok) throw new Error();
+
+    // 2) Smartemailing - přidání do seznamu
+    var cf=[
+      {customfield_id:'typ_nemovitosti',value:vdG('typ')},
+      {customfield_id:'lokality',value:vdG('lok')},
+      {customfield_id:'velikost_investice',value:vdR('vel')},
+      {customfield_id:'priority',value:vdG('pri')},
+      {customfield_id:'hledam',value:document.querySelector('[name="hl"]').value},
+      {customfield_id:'rychlost_reakce',value:vdR('rea')},
+      {customfield_id:'nda',value:vdR('nda')},
+      {customfield_id:'kanal_komunikace',value:vdG('kan')},
+      {customfield_id:'firma',value:document.querySelector('[name="firma"]').value},
+      {customfield_id:'funkce',value:document.querySelector('[name="funkce"]').value},
+      {customfield_id:'telefon',value:tel},
+      {customfield_id:'poznamka',value:document.querySelector('[name="poz"]').value}
+    ].filter(function(f){return f.value});
+
+    fetch('https://app.smartemailing.cz/api/v3/import-contacts',{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json','Authorization':'Basic '+btoa('katerina.rasinova@remaxdelta.cz:acihhx9ep4xzfsr7xgtafjru2xip8xfa2bmpqdn8')},
+      body:JSON.stringify({data:[{
+        email:em,
+        name:jms[0]||'',
+        surname:jms.slice(1).join(' ')||'',
+        contact_lists:[{id:297,status:'confirmed'}],
+        custom_fields:cf
+      }]})
+    }).catch(function(){});
+
+    document.querySelector('.main form').style.display='none';
+    document.getElementById('vf-ok').style.display='block';
+
   }catch(x){
     err.textContent='Nepodařilo se odeslat. Zkuste to prosím znovu nebo nás kontaktujte na tomas@frydek.cz';
     err.style.display='block';
