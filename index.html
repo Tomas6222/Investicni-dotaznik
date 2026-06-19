@@ -464,7 +464,7 @@ function goTo(n){
     if(i<cur)el.classList.add('done');
     if(i===cur)el.classList.add('active');
   });
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelector('.progress-wrap').scrollIntoView({behavior:'smooth', block:'start'});
 }
 function next(f){if(f<3)goTo(f+1)}
 function prev(f){if(f>0)goTo(f-1)}
@@ -491,13 +491,13 @@ async function submitForm(){
     {customfield_id:'poznamka',value:document.querySelector('[name="poz"]').value}
   ].filter(function(f){return f.value});
   try{
-    var r=await fetch('https://app.smartemailing.cz/api/v3/import-contacts',{
+    await fetch('https://app.smartemailing.cz/api/v3/import-contacts',{
       method:'POST',
+      mode:'no-cors',
       headers:{'Content-Type':'application/json','Authorization':'Basic '+btoa('katerina.rasinova@remaxdelta.cz:acihhx9ep4xzfsr7xgtafjru2xip8xfa2bmpqdn8')},
       body:JSON.stringify({data:[{email:em,name:jms[0]||'',surname:jms.slice(1).join(' ')||'',contact_lists:[{id:297,status:'confirmed'}],custom_fields:cf}]})
     });
-    if(r.ok){document.querySelector('.main form').style.display='none';document.getElementById('vf-ok').style.display='block'}
-    else throw new Error();
+    document.querySelector('.main form').style.display='none';document.getElementById('vf-ok').style.display='block';
   }catch(x){
     err.textContent='Nepodařilo se odeslat. Zkuste to prosím znovu.';err.style.display='block';
     btn.disabled=false;btn.textContent='Odeslat profil →';
